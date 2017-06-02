@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy Searching</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <style>
+    html,body {
+      background: url(https://thumbs.dreamstime.com/z/fast-food-background-seamless-icons-appetizing-31382350.jpg) no-repeat center center fixed;
+      -webkit-background-size: cover; /* For WebKit*/
+      -moz-background-size: cover;    /* Mozilla*/
+      -o-background-size: cover;      /* Opera*/
+      background-size: cover;         /* Generic*/
+    }
+    button {
+      padding: 0 2%;
+      margin: 0 2%;
+    }
+    h4 {
+      font-size: 165%;
+      font-weight: bold;
+      color: white;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.2);
+      max-width: 1000px;
+      width: 100%;
+      margin-top: 3%;
+    }
+    .bottom {
+      margin-bottom:3%;
+    }
+    .btn {
+      margin-top: 2%;
+      margin-bottom: 2%;
+      font-size: 125%;
+      font-weight: bold;
+    } 
+    .guide {
+      padding: 3% 0 0 0;
+    }
+    .guide-two {
+      padding: 3% 0 3% 0;
+    }
+    .tag-row {
+      padding: 3% 0 0 0;
+    }
+    .category-row {
+      padding: 3% 0 ;
+    }
+    #photo {
+      padding-bottom: 3%;
+    }
+    .rating {
+      font-size: 120%;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+    }
+    .holder {
+      background-color: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      padding: 2% 2%;
+      margin: 1%;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="container">
+    <div class="row text-center guide"><h4>Gifs are all the rage. Click one or search for your own</h4></div>
+    <div class="row text-center tag-row" id="tags"></div>
+    <div class="row text-center category-row">
+      <input type="" name="" id="category"><button class="btn btn-secondary" id="addTag">Add Category</button>
+    </div>
+  </div>
+
+  <div class="container bottom">
+    <div class="row text-center guide-two"></div>
+    <div id="photo"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script type="text/javascript">
+
+    var tags = ["cookies", "cakes", "pizza", "burgers", "bbq", "ice cream", "steak", "surprise food"];
+
+    // Function for displaying movie data
+      function renderButtons() {
+
+        $("#tags").empty();
+
+        for (var i = 0; i < tags.length; i++) {
+          $("#tags").append('<button class="tag-buttons btn btn-primary">' + tags[i] + '</button>');
+        }      
+
+      } 
+
+    // Add tags function // 
+
+    $(document).on('click', '#addTag', function(event) {
+
+      event.preventDefault();
+
+      var newTag = $("#category").val().trim();
+      tags.push(newTag);
+
+      $("#tags").append('<button class="tag-buttons btn btn-primary">' + newTag + '</button>');
+
+    });
+
+    // Tag button function //
+
+    $(document).on('click', '.tag-buttons', function(event) {
+
+      $('.guide-two').html('<h4>Click to start and stop the gif.</h4>');
+
+      // Keeps page from reloading //
+      event.preventDefault();
+
+      var type = this.innerText;
+
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + window.encodeURI(type) + "&limit=10&api_key=dc6zaTOxFJmzC";
+
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).done(function(response) {
+        for (var i = 0; i < response.data.length; i++) {
+           $("#photo").append('<div class="holder"><div class="rating">Rated: ' + response.data[i].rating + '</div><img class="gif" src="' + response.data[i].images.fixed_height_still.url + '"></div');
+        }     
+      });
+
+      $("#photo").empty();
+
+    });
+
+    // Click to animate function //
+    $('body').on('click', '.gif', function() {
+      var src = $(this).attr("src");
+        if($(this).hasClass('playing')){
+          //stop
+          $(this).attr('src', src.replace(/\.gif/i, "_s.gif"))
+          $(this).removeClass('playing');
+        } else {
+          //play
+          $(this).addClass('playing');
+          $(this).attr('src', src.replace(/\_s.gif/i, ".gif"))
+        }
+    });
+
+    renderButtons();
+   
+  </script>
+</body>
+
+</html>
